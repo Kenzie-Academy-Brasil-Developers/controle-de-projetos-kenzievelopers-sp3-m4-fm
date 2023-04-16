@@ -116,6 +116,7 @@ export const createDeveloperInfo = async (
       preferredOS: req.body.preferredOS,
       developerId: id,
     };
+
     const queryString: string = format(
       `
   INSERT INTO 
@@ -138,10 +139,12 @@ export const createDeveloperInfo = async (
       const developerInfoData = {
         preferredOS: req.body.preferredOS,
       };
-      return res.status(400).json({
-        message: "Invalid OS option",
-        options: `${developerInfoData.preferredOS}`,
-      });
+      if (developerInfoData.preferredOS !== "Windows" || "Linux" || "MacOS") {
+        return res.status(400).json({
+          message: "Invalid OS option",
+          options: ["Windows", "Linux", "MacOS"],
+        });
+      }
     }
     return res.status(500).json({ message: error });
   }
