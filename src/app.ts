@@ -1,19 +1,57 @@
 import express, { Application } from "express";
 import "dotenv/config";
+import {
+  createDeveloper,
+  createDeveloperInfo,
+  deleteDeveloper,
+  listDeveloper,
+  updateDeveloper,
+} from "./logic/developersTable";
+import { ensureDeveloperEmailExistsMiddleware } from "./middlewares/developersTable/ensureDeveloperEmailExists.middlewares";
+import { ensureDeveloperExistsMiddleware } from "./middlewares/developersTable/ensureDeveloperExists.middleware";
+import { ensureDeveloperInfoExistsMiddleware } from "./middlewares/developersTable/ensureDeveloperInfoExists.middleware";
+
+import {
+  createProject,
+  deleteProject,
+  listProjectTechnology,
+  updateProject,
+} from "./logic/projectsTable";
+import { ensureDeveloperIdExistsMiddleware } from "./middlewares/projectsTable/ensureDeveloperIdExists.middleware";
+import { ensureProjectIdExistsMiddleware } from "./middlewares/projectsTable/ensureProjectExists.middleware";
 
 const app: Application = express();
 app.use(express.json());
 
-app.post("/developers");
-app.get("/developers/:id");
-app.patch("/developers/:id");
-app.delete("/developers/:id");
-app.post("/developers/:id/infos");
+app.post("/developers", ensureDeveloperEmailExistsMiddleware, createDeveloper);
+app.get("/developers/:id", ensureDeveloperExistsMiddleware, listDeveloper);
+app.patch(
+  "/developers/:id",
+  ensureDeveloperExistsMiddleware,
+  ensureDeveloperEmailExistsMiddleware,
+  updateDeveloper
+);
+app.delete("/developers/:id", ensureDeveloperExistsMiddleware, deleteDeveloper);
+app.post(
+  "/developers/:id/infos",
+  ensureDeveloperExistsMiddleware,
+  ensureDeveloperInfoExistsMiddleware,
+  createDeveloperInfo
+);
 
-app.post("/projects");
-app.get("/projects/:id");
-app.patch("/projects/:id");
-app.delete("/projects/:id");
+app.post("/projects", ensureDeveloperIdExistsMiddleware, createProject);
+app.get(
+  "/projects/:id",
+  ensureProjectIdExistsMiddleware,
+  listProjectTechnology
+);
+app.patch(
+  "/projects/:id",
+  ensureProjectIdExistsMiddleware,
+  ensureDeveloperIdExistsMiddleware,
+  updateProject
+);
+app.delete("/projects/:id", ensureProjectIdExistsMiddleware, deleteProject);
 app.post("/projects/:id/technologies");
 app.delete("/projects/:id/technologies/:name");
 
