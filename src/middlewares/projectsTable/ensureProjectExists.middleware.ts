@@ -32,7 +32,7 @@ export const ensureProjectIdExistsMiddleware = async (
 
   if (queryResult.rowCount === 0) {
     const message: IError = {
-      error: "Project not found.",
+      message: "Project not found.",
     };
     return res.status(404).json(message);
   }

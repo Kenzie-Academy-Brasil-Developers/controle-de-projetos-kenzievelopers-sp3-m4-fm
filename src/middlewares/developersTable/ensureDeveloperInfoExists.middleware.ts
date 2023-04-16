@@ -31,7 +31,7 @@ export const ensureDeveloperInfoExistsMiddleware = async (
 
   if (queryResult.rowCount >= 1) {
     const message: IError = {
-      error: "Developer info already exists.",
+      message: "Developer info already exists.",
     };
     return res.status(409).json(message);
   }

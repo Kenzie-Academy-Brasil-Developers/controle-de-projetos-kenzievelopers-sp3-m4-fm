@@ -27,7 +27,7 @@ export const ensureDeveloperEmailExistsMiddleware = async (
 
   if (queryResult.rowCount >= 1) {
     const message: IError = {
-      error: "Email already exists.",
+      message: "Email already exists.",
     };
     return res.status(409).json(message);
   }

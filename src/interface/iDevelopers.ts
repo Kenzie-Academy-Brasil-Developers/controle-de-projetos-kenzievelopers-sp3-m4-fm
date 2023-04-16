@@ -7,5 +7,5 @@ export interface IDevelopers {
 export type TDevelopersRequestBody = Omit<IDevelopers, "id">;
 
 export interface IError {
-  error: string;
+  message: string;
 }

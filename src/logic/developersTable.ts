@@ -41,7 +41,7 @@ dev."id" AS "developerId",
 dev."name" AS "developerName",
 dev."email" AS "developerEmail",
 "devInf"."developerSince" AS "developerInfoDeveloperSince",
-"devInf"."preferredOS" AS "developerInfoPrederredOS"
+"devInf"."preferredOS" AS "developerInfoPreferredOS"
 FROM
   developer_infos "devInf"
 RIGHT JOIN
@@ -135,7 +135,13 @@ export const createDeveloperInfo = async (
     return res.status(201).json(queryResult.rows[0]);
   } catch (error) {
     if (error instanceof Error) {
-      return res.status(400).json({ message: error.message });
+      const developerInfoData = {
+        preferredOS: req.body.preferredOS,
+      };
+      return res.status(400).json({
+        message: "Invalid OS option",
+        options: `${developerInfoData.preferredOS}`,
+      });
     }
     return res.status(500).json({ message: error });
   }

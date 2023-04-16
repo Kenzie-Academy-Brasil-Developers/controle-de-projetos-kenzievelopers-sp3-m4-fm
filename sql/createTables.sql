@@ -52,8 +52,3 @@ CREATE TABLE IF NOT EXISTS projects_technologies(
     "projectId" INTEGER NOT NULL,
     FOREIGN KEY ("projectId") REFERENCES projects("id") ON DELETE CASCADE
 );
-
-INSERT INTO
-    developers (% I)
-VALUES
-    (% L) RETURNING *;
