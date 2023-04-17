@@ -10,5 +10,3 @@ export interface IAddtechBodyRequest {
   technologyId: number;
   addedIn: Date;
 }
-
-// export interface iTechsPrejectRes extends iTechs, IProjectUpatedRequestBody {}

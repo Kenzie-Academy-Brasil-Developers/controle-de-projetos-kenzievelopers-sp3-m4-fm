@@ -15,6 +15,7 @@ import {
   addProjectTech,
   createProject,
   deleteProject,
+  deleteTechInProject,
   listProjectTechnology,
   updateProject,
 } from "./logic/projectsTable";
@@ -22,7 +23,7 @@ import { ensureDeveloperIdExistsMiddleware } from "./middlewares/projectsTable/e
 import { ensureProjectIdExistsMiddleware } from "./middlewares/projectsTable/ensureProjectExists.middleware";
 import { ensureTechNameExists } from "./middlewares/projectsTable/ensureTechNameExists.middleware";
 import { ensureTechNameIsAlreadyInUseMiddleware } from "./middlewares/projectsTable/ensureTechNameIsAlreadyInUse.middleware";
-// import { ensureTechNameIsAlreadyInUseMiddleware } from "./middlewares/projectsTable/ensureTechNameIsAlreadyInUse.middleware";
+import { ensureTechNameExistsToBeDeleteMiddleWare } from "./middlewares/projectsTable/ensureTechNameExistsToBeDelete.middleware";
 
 const app: Application = express();
 app.use(express.json());
@@ -63,6 +64,11 @@ app.post(
   ensureTechNameIsAlreadyInUseMiddleware,
   addProjectTech
 );
-app.delete("/projects/:id/technologies/:name");
+app.delete(
+  "/projects/:id/technologies/:name",
+  ensureProjectIdExistsMiddleware,
+  ensureTechNameExistsToBeDeleteMiddleWare,
+  deleteTechInProject
+);
 
 export default app;

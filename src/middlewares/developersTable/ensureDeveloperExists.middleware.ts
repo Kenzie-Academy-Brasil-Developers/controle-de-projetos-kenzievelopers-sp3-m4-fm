@@ -29,7 +29,7 @@ export const ensureDeveloperExistsMiddleware = async (
 
   if (queryResult.rowCount === 0) {
     const message: IError = {
-      message: "Developer no found.",
+      message: "Developer not found.",
     };
     return res.status(404).json(message);
   }

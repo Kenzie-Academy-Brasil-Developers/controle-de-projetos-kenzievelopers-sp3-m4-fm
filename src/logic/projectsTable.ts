@@ -179,3 +179,33 @@ export const addProjectTech = async (
   );
   return res.status(201).json(queryResult.rows[0]);
 };
+
+export const deleteTechInProject = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const idProj: number = parseInt(req.params.id);
+  const idTechs: number = Number(res.locals.queryResult);
+
+  const queryString: string = `
+        DELETE FROM
+            projects_technologies pt 
+        WHERE
+            pt."technologyId" = $1 AND pt."projectId" = $2
+        RETURNING *;   
+    `;
+  const queryConfig: QueryConfig = {
+    text: queryString,
+    values: [idTechs, idProj],
+  };
+
+  const queryResult: QueryResult = await client.query(queryConfig);
+
+  if (queryResult.rowCount === 0) {
+    return res.status(400).json({
+      message: "Project not found.",
+    });
+  }
+
+  return res.status(204).json();
+};

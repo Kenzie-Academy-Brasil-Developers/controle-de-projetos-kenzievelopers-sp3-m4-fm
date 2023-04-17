@@ -1,11 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { QueryConfig, QueryResult } from "pg";
 import { client } from "../../database";
-import {
-  IAddtechBodyRequest,
-  iTechResult,
-  iTechs,
-} from "../../interface/iProjectTech";
+import { IAddtechBodyRequest, iTechs } from "../../interface/iProjectTech";
 import { IError } from "../../interface/iDevelopers";
 
 export const ensureTechNameIsAlreadyInUseMiddleware = async (
