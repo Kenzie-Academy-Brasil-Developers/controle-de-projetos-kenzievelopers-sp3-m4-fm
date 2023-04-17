@@ -10,10 +10,6 @@ import format from "pg-format";
 import { QueryConfig, QueryResult } from "pg";
 import { client } from "../database";
 import { IProjectTecResponseBody } from "../interface/iProjectsTechnologies";
-import {
-  ITechnology,
-  TTechnologyRequestBody,
-} from "../interface/iTechnologies";
 
 export const createProject = async (
   req: Request,
@@ -22,6 +18,7 @@ export const createProject = async (
   const projectsData:
     | TProjectRequestBodyWithEndDate
     | TProjectRequestBodyWithoutEndDate = req.body;
+
   const queryString: string = format(
     `
   INSERT INTO 
@@ -34,9 +31,11 @@ export const createProject = async (
     Object.keys(projectsData),
     Object.values(projectsData)
   );
+
   const queryResult: QueryResult<
     TProjectResponseBodyWithEndDate | TProjectResponseBodyWithoutEndDate
   > = await client.query(queryString);
+
   return res.status(201).json(queryResult.rows[0]);
 };
 
@@ -47,8 +46,7 @@ export const listProjectTechnology = async (
   const { id } = req.params;
 
   const queryString: string = `
-  
-  SELECT
+    SELECT
       proj."id" AS "projectId",
       proj."name" AS "projectName",
       proj."description" AS "projectDescription",
@@ -59,21 +57,17 @@ export const listProjectTechnology = async (
       proj."developerId" AS "projectDeveloperId",
       tec.id AS "technologyId",
       tec.name AS "technologyName"
-  FROM
-      "projects_technologies" "projInf"
-  RIGHT JOIN
-      technologies tec ON tec.id = "projInf"."technologyId"
-  RIGHT JOIN
-      projects proj ON "projInf"."projectId" = proj."id"
-  WHERE proj."id"=$1;
+    FROM
+      projects_technologies projtec
+      RIGHT JOIN technologies tec ON tec.id = projtec."technologyId"
+      RIGHT JOIN projects proj ON projtec."projectId" = proj."id"
+    WHERE proj."id" = $1;
   `;
 
-  const queryResult: QueryResult<IProjectTecResponseBody> = await client.query(
-    queryString,
-    [id]
-  );
+  const queryResult: QueryResult<IProjectTecResponseBody> =
+    await client.query<IProjectTecResponseBody>(queryString, [id]);
 
-  return res.json(queryResult.rows[0]);
+  return res.status(200).json(queryResult.rows);
 };
 
 export const updateProject = async (
@@ -126,34 +120,3 @@ export const deleteProject = async (
   await client.query(queryConfig);
   return res.status(204).send();
 };
-
-// export const addTechnologyToProject = async (
-//   req: Request,
-//   res: Response
-// ): Promise<Response> => {
-//   const technologyData:TTechnologyRequestBody=req.body;
-//   const projectsId:number=parseInt(req.params.id)
-
-//   const data: = {
-//     ...technologyData,
-//     projectsId,
-// }
-
-//   const { name } = req.body;
-
-//   const queryPart: string = `
-//   SELECT
-//   *
-// FROM
-//   technologies t
-// WHERE
-//   t.name = $1
-// `;
-// const partQueryFormat: string = format(queryPart, partName);
-//   const partQueryResult: QueryResult<IProjectTecResponseBody> = await client.query(
-//     partQueryFormat,
-//     [name]
-//   );
-
-//   return res.json(queryResult.rows[0]);
-// };

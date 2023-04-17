@@ -4,7 +4,7 @@ import {
   TProjectResponseBodyWithEndDate,
   TProjectResponseBodyWithoutEndDate,
 } from "../../interface/iProjects";
-import { IError } from "../../interface/iDevelopers";
+import { IDevelopers, IError } from "../../interface/iDevelopers";
 import { client } from "../../database";
 
 export const ensureDeveloperIdExistsMiddleware = async (
@@ -12,15 +12,21 @@ export const ensureDeveloperIdExistsMiddleware = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const id = req.body.id;
+  let id: number = parseInt(req.params.id);
+
+  if (req.route.path === "/projects" && req.method === "POST") {
+    id = req.body.developerId;
+  } else if (req.route.path === "/projects/:id" && req.method === "PATCH") {
+    id = req.body.developerId;
+  }
 
   const queryString: string = `
       SELECT
           *
       FROM
-        projects
+          developers 
       WHERE
-        "developerId" = $1;
+          "id" = $1;
       `;
 
   const queryConfig: QueryConfig = {
@@ -28,19 +34,15 @@ export const ensureDeveloperIdExistsMiddleware = async (
     values: [id],
   };
 
-  const queryResult: QueryResult<
-    TProjectResponseBodyWithoutEndDate | TProjectResponseBodyWithEndDate
-  > = await client.query(queryConfig);
-  const project:
-    | TProjectResponseBodyWithoutEndDate
-    | TProjectResponseBodyWithEndDate = queryResult.rows[0];
+  const queryResult: QueryResult<IDevelopers> = await client.query(queryConfig);
 
   if (queryResult.rowCount === 0) {
-    const message: IError = {
-      message: "Developer no found.",
-    };
-    return res.status(404).json(message);
+    return res.status(404).json({
+      message: "Developer no found",
+    });
   }
-  res.locals.project = project;
+
+  res.locals.project = queryResult.rows[0];
+
   return next();
 };
