@@ -12,6 +12,7 @@ import { ensureDeveloperExistsMiddleware } from "./middlewares/developersTable/e
 import { ensureDeveloperInfoExistsMiddleware } from "./middlewares/developersTable/ensureDeveloperInfoExists.middleware";
 
 import {
+  addProjectTech,
   createProject,
   deleteProject,
   listProjectTechnology,
@@ -19,6 +20,9 @@ import {
 } from "./logic/projectsTable";
 import { ensureDeveloperIdExistsMiddleware } from "./middlewares/projectsTable/ensureDeveloperIdExists.middleware";
 import { ensureProjectIdExistsMiddleware } from "./middlewares/projectsTable/ensureProjectExists.middleware";
+import { ensureTechNameExists } from "./middlewares/projectsTable/ensureTechNameExists.middleware";
+import { ensureTechNameIsAlreadyInUseMiddleware } from "./middlewares/projectsTable/ensureTechNameIsAlreadyInUse.middleware";
+// import { ensureTechNameIsAlreadyInUseMiddleware } from "./middlewares/projectsTable/ensureTechNameIsAlreadyInUse.middleware";
 
 const app: Application = express();
 app.use(express.json());
@@ -52,7 +56,13 @@ app.patch(
   updateProject
 );
 app.delete("/projects/:id", ensureProjectIdExistsMiddleware, deleteProject);
-app.post("/projects/:id/technologies");
+app.post(
+  "/projects/:id/technologies",
+  ensureProjectIdExistsMiddleware,
+  ensureTechNameExists,
+  ensureTechNameIsAlreadyInUseMiddleware,
+  addProjectTech
+);
 app.delete("/projects/:id/technologies/:name");
 
 export default app;

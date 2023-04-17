@@ -9,7 +9,8 @@ import {
 import format from "pg-format";
 import { QueryConfig, QueryResult } from "pg";
 import { client } from "../database";
-import { IProjectTecResponseBody } from "../interface/iProjectsTechnologies";
+import { IProjectTecResponseBody } from "../interface/iProjects";
+import { IAddtechBodyRequest } from "../interface/iProjectTech";
 
 export const createProject = async (
   req: Request,
@@ -119,4 +120,62 @@ export const deleteProject = async (
   };
   await client.query(queryConfig);
   return res.status(204).send();
+};
+
+export const addProjectTech = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const id = parseInt(req.params.id);
+  const techDate = new Date();
+
+  const techData: IAddtechBodyRequest = {
+    projectId: id,
+    technologyId: res.locals.tech.techId,
+    addedIn: techDate,
+  };
+
+  const queryString: string = format(
+    `
+        INSERT INTO 
+            projects_technologies 
+            (%I)
+        VALUES 
+            (%L)
+        RETURNING *;
+    `,
+    Object.keys(techData),
+    Object.values(techData)
+  );
+
+  await client.query(queryString);
+
+  const queryTemplate: string = `
+        SELECT
+            t.id as "technologyId",
+            t."name" as "technologyName",
+            p.id as "projectId",
+            p."name" as "projectName",
+            p."description" as "projectDescription",
+            p."estimatedTime" as "projectEstimatedTime",
+            p."repository" as "projectRepository",
+            p."startDate" as "projectStartDate",
+            p."endDate" as "projectEndDate"
+        FROM
+            technologies t 
+        LEFT JOIN 
+            projects_technologies pt ON pt."technologyId" = t.id
+        LEFT JOIN 
+            projects p  ON pt."projectId" = p.id
+        WHERE p.id = $1;
+    `;
+  const newQueryConfig: QueryConfig = {
+    text: queryTemplate,
+    values: [techData.projectId],
+  };
+
+  const queryResult: QueryResult<IProjectTecResponseBody> = await client.query(
+    newQueryConfig
+  );
+  return res.status(201).json(queryResult.rows[0]);
 };

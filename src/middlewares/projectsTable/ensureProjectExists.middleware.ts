@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { QueryConfig, QueryResult } from "pg";
-import { IProjectTecResponseBody } from "../../interface/iProjectsTechnologies";
 import { IError } from "../../interface/iDevelopers";
 import { client } from "../../database";
+import { IProjectTecResponseBody } from "../../interface/iProjects";
 
 export const ensureProjectIdExistsMiddleware = async (
   req: Request,
@@ -28,7 +28,7 @@ export const ensureProjectIdExistsMiddleware = async (
   const queryResult: QueryResult<IProjectTecResponseBody> = await client.query(
     queryConfig
   );
-  const project: IProjectTecResponseBody = queryResult.rows[0];
+  // const project: IProjectTecResponseBody = queryResult.rows[0];
 
   if (queryResult.rowCount === 0) {
     const message: IError = {
@@ -36,6 +36,6 @@ export const ensureProjectIdExistsMiddleware = async (
     };
     return res.status(404).json(message);
   }
-  res.locals.project = project;
+  // res.locals.project = project;
   return next();
 };

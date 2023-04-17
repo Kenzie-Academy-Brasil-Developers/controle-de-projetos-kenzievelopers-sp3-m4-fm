@@ -1,9 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import { QueryConfig, QueryResult } from "pg";
-import {
-  TProjectResponseBodyWithEndDate,
-  TProjectResponseBodyWithoutEndDate,
-} from "../../interface/iProjects";
 import { IDevelopers, IError } from "../../interface/iDevelopers";
 import { client } from "../../database";
 
